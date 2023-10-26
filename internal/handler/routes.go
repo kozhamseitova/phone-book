@@ -10,6 +10,6 @@ func (h *Handler) InitRoutes(router *fiber.App) {
 	v1 := api.Group("/v1")
 
 	lead := v1.Group("/lead")
-	lead.Get("/")
-	lead.Post("/")
+	lead.Get("/", h.search)
+	lead.Post("/", h.create)
 }
