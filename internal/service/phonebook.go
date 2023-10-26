@@ -7,9 +7,9 @@ import (
 )
 
 func(s *service) Search(ctx context.Context, search models.Search) ([]*models.Search, error) {
-	return nil, nil
+	return s.repository.GetByPhoneAndName(ctx, search)
 }
 
 func(s *service) Create(ctx context.Context, search models.Search) error {
-	return nil
+	return s.repository.Create(ctx, search)
 }

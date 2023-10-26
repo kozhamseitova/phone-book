@@ -6,16 +6,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/kozhamseitova/phone-book/api"
 	"github.com/kozhamseitova/phone-book/internal/models"
+	"github.com/kozhamseitova/phone-book/utils"
 )
 
 func(h *Handler) search(c *fiber.Ctx) error {
-	phone := c.Params("Search[phone]")
-	name := c.Params("Search[name]")
-
-	search := models.Search{
-		Phone: phone,
-		Name: name,
-	}
+	var search models.Search
+	c.QueryParser(&search)
 
 	result, err := h.service.Search(c.UserContext(), search)
 	if err != nil {
@@ -43,6 +39,13 @@ func(h *Handler) create(c *fiber.Ctx) error {
 		})
 	}
 
+	if !checkParams(req) {
+		return c.Status(http.StatusInternalServerError).JSON(&api.Error{
+			Code:    http.StatusInternalServerError,
+			Message: utils.ErrInvalidParam.Error(),
+		})
+	}
+
 	err = h.service.Create(c.UserContext(), req)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(&api.Error{
@@ -55,4 +58,12 @@ func(h *Handler) create(c *fiber.Ctx) error {
 		Code:    http.StatusOK,
 		Message: "succes",
 	})
+}
+
+func checkParams(req models.Search) bool {
+	if req.Name == "" || len(req.Name) < 3 || req.Phone == "" || len(req.Phone) < 11 {
+		return false
+	}
+	return true
+	
 }
