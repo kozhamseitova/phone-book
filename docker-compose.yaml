@@ -1,16 +1,32 @@
-version: "3.9"
+version: '3.9'
 services:
-  app:
-      build:
-        context: .
-        dockerfile: Dockerfile
-      ports:
-        - "8080:8080"
   postgres:
-    image: postgres:16
+    image: postgres:latest
+    restart: always
     environment:
-      POSTGRES_DB: "phone-book"
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: phone-book
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - phone-book
+
+  go_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - phone-book
+
+networks:
+  phone-book:
+    driver: bridge
+volumes:
+  postgres_data:
